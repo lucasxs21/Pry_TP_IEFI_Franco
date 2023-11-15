@@ -15,53 +15,28 @@ namespace Pry_TP_IEFI_Franco
 {
     public partial class frmVistaEmpleados : Form
     {
-        private const string connectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source = EMPLEO.accdb";
+        
         
 
         public frmVistaEmpleados()
         {
             InitializeComponent();
-            CargarDatosTreeView();
+            
         }
-
+        BD objBD = new BD();
         private void Vista_Empleados_Load(object sender, EventArgs e)
         {
-
+            objBD.CargarTreeView(tvEmpleados);
         }
         
-
-        private void CargarDatosTreeView()
-        {
-            tvEmpleados.Nodes.Clear();
-
-            using (OleDbConnection conexion = new OleDbConnection(connectionString))
-            {
-                conexion.Open();
-                string consulta = "SELECT * FROM DATOS PERSONALES";
-                OleDbCommand comando = new OleDbCommand(consulta, conexion);
-                OleDbDataReader reader = comando.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    string codigoEmpleado = reader["CODIGO"].ToString();
-                    string nombre = reader["NOMBRE"].ToString();
-                    string cargo = reader["aPELLIDO"].ToString();
-                    string gradoAcademico = reader["GradoAcademico"].ToString();
-
-                    TreeNode nodoEmpleado = new TreeNode($"{codigoEmpleado} - {nombre}");
-                    nodoEmpleado.Tag = $"{codigoEmpleado} - {nombre}\nCargo: {cargo}\nGrado Académico: {gradoAcademico}";
-
-                    tvEmpleados.Nodes.Add(nodoEmpleado);
-                }
-
-                conexion.Close();
-            }
-        }
-
         private void tvEmpleados_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            string detalles = e.Node.Tag.ToString();
-            rtbContenido.Text = detalles;
+            string codEmpleado = e.Node.Text;
+            rtbContenido.Clear();
+            objBD.MostrarDatosPersonales(codEmpleado, rtbContenido);
+            objBD.MostrarDatosLaborales(codEmpleado, rtbContenido);
+            objBD.MostrarDatosAcademicos(codEmpleado, rtbContenido);
+
         }
     }
 }
